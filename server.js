@@ -6,6 +6,9 @@ const app = express();
 
 const port = process.env.PORT || 8000;
 
+const studentRoutes = require("./routes/student");
+const teacherRoutes = require("./routes/teacher");
+
 mongoose
   .connect(process.env.DATABASE, {
     useUnifiedTopology: true,
@@ -20,5 +23,8 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Hello");
 });
+
+app.use("/api", studentRoutes);
+app.use("/api", teacherRoutes);
 
 app.listen(port, () => console.log(`Server Running at Port: ${port}`));
