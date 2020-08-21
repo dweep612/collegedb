@@ -6,6 +6,7 @@ const app = express();
 
 const port = process.env.PORT || 8000;
 
+const adminRoutes = require("./routes/admin");
 const studentRoutes = require("./routes/student");
 const teacherRoutes = require("./routes/teacher");
 
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
   res.send("Hello");
 });
 
+app.use("/api", adminRoutes);
 app.use("/api", studentRoutes);
 app.use("/api", teacherRoutes);
 
