@@ -1,4 +1,6 @@
 const Teacher = require("../models/teacher");
+const Student = require("../models/student");
+const teacher = require("../models/teacher");
 
 exports.getTeacherBySubject = (req, res) => {
   const subject = req.body.subject;
@@ -46,5 +48,38 @@ exports.whatTeach = (req, res) => {
     }
 
     res.json(teacher);
+  });
+};
+
+exports.studentsInstructors = (req, res) => {
+  const studentName = req.body.student;
+
+  const firstname = studentName.split(" ")[0];
+  const lastname = studentName.split(" ")[1];
+
+  Student.findOne(
+    { $and: [{ firstname: firstname }, { lastname: lastname }] },
+    { _id: 0, firstname: 1, lastname: 1, branch: 1, year: 1 }
+  ).exec((err, student) => {
+    if (err || !student) {
+      return res.status(400).json({
+        error: "No Student found",
+      });
+    }
+
+    const { branch, year } = student;
+
+    Teacher.find(
+      { $and: [{ branch: branch }, { year: year }] },
+      { _id: 0, firstname: 1, lastname: 1, subject: 1, branch: 1, year: 1 }
+    ).exec((err, teacher) => {
+      if (err || !teacher || teacher.length == 0) {
+        return res.status(400).json({
+          error: "No Lecturer/s found",
+        });
+      }
+
+      res.json(teacher);
+    });
   });
 };
