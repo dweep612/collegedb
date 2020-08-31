@@ -15,9 +15,9 @@ exports.getTeacherBySubject = (req, res) => {
       year: 1,
     }
   ).exec((err, teacher) => {
-    if (err || !teacher) {
+    if (err || !teacher || teacher.length == 0) {
       return res.status(400).json({
-        error: "Teachers not found",
+        error: "No Lecturer/s found",
       });
     }
 
@@ -25,5 +25,26 @@ exports.getTeacherBySubject = (req, res) => {
       "Total No. of Teacher: ": teacher.length,
       "Detail of Teachers": teacher,
     });
+  });
+};
+
+exports.whatTeach = (req, res) => {
+  const name = req.body.name;
+  // const firstname = req.body.firstname;
+
+  const firstname = name.split(" ")[0];
+  const lastname = name.split(" ")[1];
+
+  Teacher.find(
+    { $and: [{ firstname: firstname }, { lastname: lastname }] },
+    { _id: 0, firstname: 1, lastname: 1, subject: 1, branch: 1, year: 1 }
+  ).exec((err, teacher) => {
+    if (err || !teacher || teacher.length == 0) {
+      return res.status(400).json({
+        error: "No Lecturer/s found",
+      });
+    }
+
+    res.json(teacher);
   });
 };
