@@ -83,3 +83,36 @@ exports.studentsInstructors = (req, res) => {
     });
   });
 };
+
+exports.instructorsStudents = (req, res) => {
+  const teacherName = req.body.teacher;
+
+  const firstname = teacherName.split(" ")[0];
+  const lastname = teacherName.split(" ")[1];
+
+  Teacher.findOne(
+    { $and: [{ firstname: firstname }, { lastname: lastname }] },
+    { _id: 0, firstname: 1, lastname: 1, subject: 1, branch: 1, year: 1 }
+  ).exec((err, teacher) => {
+    if (err || !teacher) {
+      return res.status(400).json({
+        error: "No Lecturer found",
+      });
+    }
+
+    const { branch, year } = teacher;
+
+    Student.find(
+      { $and: [{ branch: branch }, { year: year }] },
+      { _id: 0, firstname: 1, lastname: 1, branch: 1, year: 1 }
+    ).exec((err, student) => {
+      if (err || !student || student.length == 0) {
+        return res.status(400).json({
+          error: "No Student/s found",
+        });
+      }
+
+      res.json(student);
+    });
+  });
+};
